@@ -94,7 +94,7 @@ class AuthController extends Controller
         }
 
         Session::login($usuario->getId(), $usuario->getNome());
-        Session::flash('sucesso', 'Olá, ' . $usuario->getNome() . '!');
+        Session::flash('sucesso', 'Login realizado com sucesso.');
 
         $this->redirecionar('/painel');
     }

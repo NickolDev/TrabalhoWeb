@@ -3,6 +3,7 @@
 -- Rode DEPOIS do schema.sql. Os dois usuários têm a senha: bazar123
 -- =====================================================================
 
+SET NAMES utf8mb4;
 USE bazar_universitario;
 
 INSERT INTO usuarios (nome, email, senha_hash) VALUES

@@ -7,6 +7,9 @@
 --   3. ON DELETE CASCADE            -> remover um item remove seus interesses
 -- =====================================================================
 
+-- Garante que os acentos sejam gravados corretamente
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS bazar_universitario
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
