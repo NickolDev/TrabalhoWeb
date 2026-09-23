@@ -58,7 +58,13 @@ class ItemDAO extends DAO
     public function listarPorUsuario(int $usuarioId): array
     {
         $stmt = $this->pdo->prepare(
-            self::SELECT_COMPLETO . ' WHERE i.usuario_id = :usuario_id ORDER BY i.status, i.criado_em DESC, i.id DESC'
+            'SELECT i.*, c.nome AS categoria_nome, u.nome AS dono_nome,
+                    (SELECT COUNT(*) FROM interesses x WHERE x.item_id = i.id) AS total_interesses
+               FROM itens i
+               JOIN categorias c ON c.id = i.categoria_id
+               JOIN usuarios u   ON u.id = i.usuario_id
+              WHERE i.usuario_id = :usuario_id
+              ORDER BY i.status, i.criado_em DESC, i.id DESC'
         );
         $stmt->execute(['usuario_id' => $usuarioId]);
 

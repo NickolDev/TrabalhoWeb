@@ -29,6 +29,7 @@ abstract class Item
     // Dados "de leitura" vindos de JOIN (para exibição)
     private ?string $nomeCategoria = null;
     private ?string $nomeDono = null;
+    private ?int $totalInteresses = null;
 
     public function __construct(
         ?int $id,
@@ -102,6 +103,7 @@ abstract class Item
 
         $item->nomeCategoria = $linha['categoria_nome'] ?? null;
         $item->nomeDono = $linha['dono_nome'] ?? null;
+        $item->totalInteresses = isset($linha['total_interesses']) ? (int) $linha['total_interesses'] : null;
 
         return $item;
     }
@@ -191,6 +193,11 @@ abstract class Item
     public function getNomeDono(): ?string
     {
         return $this->nomeDono;
+    }
+
+    public function getTotalInteresses(): ?int
+    {
+        return $this->totalInteresses;
     }
 
     // ---------- Setters com validação ----------
