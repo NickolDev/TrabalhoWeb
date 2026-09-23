@@ -1,0 +1,10 @@
+# Usado no XAMPP, quando o projeto inteiro fica dentro de htdocs.
+# Tudo é redirecionado para public/, então src/, config/ e database/
+# nunca ficam acessíveis pelo navegador.
+# (Na VM do Google Cloud o DocumentRoot já aponta direto para public/.)
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

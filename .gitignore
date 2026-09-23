@@ -1,0 +1,13 @@
+# Configuração local (contém a senha do banco) — nunca versionar
+config/config.php
+
+# Fotos enviadas pelos usuários
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/.htaccess
+
+# IDEs e sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
