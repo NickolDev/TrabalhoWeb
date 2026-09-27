@@ -13,9 +13,8 @@ final class Config
     public static function carregar(string $arquivo): void
     {
         if (!is_file($arquivo)) {
-            throw new \RuntimeException(
-                'Arquivo config/config.php não encontrado. Copie config/config.example.php para config/config.php.'
-            );
+            http_response_code(500);
+            exit('Arquivo config/config.php não encontrado. Copie config/config.example.php para config/config.php.');
         }
 
         self::$valores = require $arquivo;

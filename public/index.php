@@ -6,8 +6,6 @@
  * que carrega as configurações, registra as rotas e chama o Router.
  */
 
-declare(strict_types=1);
-
 use App\Controller\AuthController;
 use App\Controller\HomeController;
 use App\Controller\InteresseController;

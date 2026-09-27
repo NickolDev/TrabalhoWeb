@@ -47,6 +47,12 @@ abstract class Controller
     /** Todo POST precisa trazer o token CSRF válido. */
     protected function validarCsrf(): void
     {
+        // Se o formulário passar do post_max_size do php.ini, o PHP descarta todo o $_POST
+        // (inclusive o token). Nesse caso a mensagem certa é "arquivo grande demais".
+        if (empty($_POST) && !empty($_SERVER['CONTENT_LENGTH'])) {
+            throw HttpException::requisicaoInvalida('O arquivo enviado é grande demais. Envie uma foto de até 2 MB.');
+        }
+
         if (!Csrf::valido($_POST['_csrf'] ?? null)) {
             throw HttpException::requisicaoInvalida('Sessão expirada ou formulário inválido. Recarregue a página e tente novamente.');
         }
