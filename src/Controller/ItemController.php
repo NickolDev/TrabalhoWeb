@@ -124,7 +124,7 @@ class ItemController extends Controller
 
             if ($novaFoto !== null) {
                 $item->setFoto($novaFoto);
-            } elseif ($this->post('remover_foto') === '1') {
+            } elseif ($this->campoPost('remover_foto') === '1') {
                 $item->setFoto(null);
             }
 
@@ -162,7 +162,7 @@ class ItemController extends Controller
         $this->itens->atualizar($item);
         Session::flash('sucesso', $mensagem);
 
-        $this->redirecionar($this->post('voltar') === 'painel' ? '/painel' : '/itens/' . $id);
+        $this->redirecionar($this->campoPost('voltar') === 'painel' ? '/painel' : '/itens/' . $id);
     }
 
     // ---------------- DELETE ----------------
@@ -206,10 +206,10 @@ class ItemController extends Controller
     private function dadosDoFormulario(): array
     {
         return [
-            'nome'         => $this->post('nome'),
-            'descricao'    => $this->post('descricao'),
-            'categoria_id' => $this->post('categoria_id'),
-            'tipo'         => $this->post('tipo'),
+            'nome'         => $this->campoPost('nome'),
+            'descricao'    => $this->campoPost('descricao'),
+            'categoria_id' => $this->campoPost('categoria_id'),
+            'tipo'         => $this->campoPost('tipo'),
         ];
     }
 

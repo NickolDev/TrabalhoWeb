@@ -55,7 +55,7 @@ final class View
     /** Escapa qualquer dado vindo do usuário antes de exibir (prevenção de XSS). */
     public function e(mixed $valor): string
     {
-        return htmlspecialchars((string) $valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
     }
 
     public function url(string $caminho = '/'): string

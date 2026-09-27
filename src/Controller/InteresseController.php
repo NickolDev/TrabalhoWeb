@@ -52,6 +52,6 @@ class InteresseController extends Controller
         $this->interesses->remover($id, $usuarioId);
         Session::flash('sucesso', 'Interesse cancelado.');
 
-        $this->redirecionar($this->post('voltar') === 'painel' ? '/painel' : '/itens/' . $id);
+        $this->redirecionar($this->campoPost('voltar') === 'painel' ? '/painel' : '/itens/' . $id);
     }
 }

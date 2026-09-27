@@ -57,11 +57,6 @@ class Usuario
         return password_verify($senhaPura, $this->senhaHash);
     }
 
-    public function precisaRehash(): bool
-    {
-        return password_needs_rehash($this->senhaHash, PASSWORD_DEFAULT);
-    }
-
     // ---------- Getters ----------
 
     public function getId(): ?int
@@ -116,10 +111,5 @@ class Usuario
         }
 
         $this->email = $email;
-    }
-
-    public function definirSenha(string $senhaPura): void
-    {
-        $this->senhaHash = password_hash($senhaPura, PASSWORD_DEFAULT);
     }
 }

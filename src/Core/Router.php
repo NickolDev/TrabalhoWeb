@@ -7,11 +7,11 @@ namespace App\Core;
  *
  *   $router->get('/itens/{id}', [ItemController::class, 'show']);
  *
- * Parâmetros entre chaves viram argumentos inteiros do método.
+ * O {id} da URL vira um número inteiro passado para o método do Controller.
  */
 final class Router
 {
-    /** @var array<int, array{metodo: string, padrao: string, acao: array{0: class-string, 1: string}}> */
+    /** Lista de rotas: cada uma tem 'metodo', 'padrao' (regex) e 'acao' ([Controller, método]). */
     private array $rotas = [];
 
     public function get(string $caminho, array $acao): void
@@ -51,11 +51,16 @@ final class Router
                 continue;
             }
 
-            array_shift($parametros); // remove o "match completo"
-            [$classe, $acao] = $rota['acao'];
-
+            $classe = $rota['acao'][0];   // ex.: ItemController::class
+            $acao   = $rota['acao'][1];   // ex.: 'show'
             $controller = new $classe();
-            $controller->$acao(...array_map('intval', $parametros));
+
+            // $parametros[0] é a URL inteira; $parametros[1] é o que casou com o {id}
+            if (isset($parametros[1])) {
+                $controller->$acao((int) $parametros[1]);
+            } else {
+                $controller->$acao();
+            }
             return;
         }
 

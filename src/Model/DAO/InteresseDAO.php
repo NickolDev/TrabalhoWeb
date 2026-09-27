@@ -52,7 +52,12 @@ class InteresseDAO extends DAO
         );
         $stmt->execute(['item_id' => $itemId]);
 
-        return array_map([Interesse::class, 'deLinha'], $stmt->fetchAll());
+        $interesses = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $interesses[] = Interesse::deLinha($linha);
+        }
+
+        return $interesses;
     }
 
     public function contarPorItem(int $itemId): int
@@ -95,6 +100,11 @@ class InteresseDAO extends DAO
         );
         $stmt->execute(['usuario_id' => $usuarioId]);
 
-        return array_map([Item::class, 'deLinha'], $stmt->fetchAll());
+        $itens = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $itens[] = Item::deLinha($linha);
+        }
+
+        return $itens;
     }
 }

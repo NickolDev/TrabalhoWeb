@@ -32,9 +32,9 @@ class ItemDAO extends DAO
 
         if ($busca !== '') {
             $sql .= ' AND (i.nome LIKE :busca_nome OR i.descricao LIKE :busca_descricao)';
-            $termo = '%' . addcslashes($busca, '%_\\') . '%';
-            $parametros['busca_nome'] = $termo;
-            $parametros['busca_descricao'] = $termo;
+            // O % faz parte do VALOR, não do SQL: continua sendo um parâmetro seguro
+            $parametros['busca_nome'] = '%' . $busca . '%';
+            $parametros['busca_descricao'] = '%' . $busca . '%';
         }
 
         $sql .= ' ORDER BY i.criado_em DESC, i.id DESC';
@@ -42,7 +42,7 @@ class ItemDAO extends DAO
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($parametros);
 
-        return array_map([Item::class, 'deLinha'], $stmt->fetchAll());
+        return $this->criarItens($stmt->fetchAll());
     }
 
     public function buscarPorId(int $id): ?Item
@@ -68,7 +68,7 @@ class ItemDAO extends DAO
         );
         $stmt->execute(['usuario_id' => $usuarioId]);
 
-        return array_map([Item::class, 'deLinha'], $stmt->fetchAll());
+        return $this->criarItens($stmt->fetchAll());
     }
 
     public function inserir(Item $item): void
@@ -127,15 +127,34 @@ class ItemDAO extends DAO
     {
         $stmt = $this->pdo->prepare(
             "SELECT COUNT(*) AS total,
-                    COALESCE(SUM(status = 'disponivel'), 0) AS disponiveis,
-                    COALESCE(SUM(status = 'concluido'), 0)  AS concluidos,
-                    COALESCE(SUM(tipo = 'doacao'), 0)       AS doacoes,
-                    COALESCE(SUM(tipo = 'troca'), 0)        AS trocas
+                    SUM(CASE WHEN status = 'disponivel' THEN 1 ELSE 0 END) AS disponiveis,
+                    SUM(CASE WHEN status = 'concluido'  THEN 1 ELSE 0 END) AS concluidos
                FROM itens
               WHERE usuario_id = :usuario_id"
         );
         $stmt->execute(['usuario_id' => $usuarioId]);
+        $linha = $stmt->fetch();
 
-        return array_map('intval', $stmt->fetch());
+        // Sem itens, o SUM devolve NULL; o (int) transforma em 0
+        return [
+            'total'       => (int) $linha['total'],
+            'disponiveis' => (int) $linha['disponiveis'],
+            'concluidos'  => (int) $linha['concluidos'],
+        ];
+    }
+
+    /**
+     * Transforma as linhas do banco em objetos Item (ItemDoacao ou ItemTroca).
+     *
+     * @return Item[]
+     */
+    private function criarItens(array $linhas): array
+    {
+        $itens = [];
+        foreach ($linhas as $linha) {
+            $itens[] = Item::deLinha($linha);
+        }
+
+        return $itens;
     }
 }

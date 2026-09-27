@@ -45,13 +45,4 @@ class UsuarioDAO extends DAO
 
         $usuario->setId((int) $this->pdo->lastInsertId());
     }
-
-    public function atualizarSenha(Usuario $usuario): void
-    {
-        $stmt = $this->pdo->prepare('UPDATE usuarios SET senha_hash = :senha_hash WHERE id = :id');
-        $stmt->execute([
-            'senha_hash' => $usuario->getSenhaHash(),
-            'id'         => $usuario->getId(),
-        ]);
-    }
 }

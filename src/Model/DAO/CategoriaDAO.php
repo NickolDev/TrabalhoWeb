@@ -12,7 +12,12 @@ class CategoriaDAO extends DAO
         $stmt = $this->pdo->prepare('SELECT id, nome FROM categorias ORDER BY nome');
         $stmt->execute();
 
-        return array_map([Categoria::class, 'deLinha'], $stmt->fetchAll());
+        $categorias = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $categorias[] = Categoria::deLinha($linha);
+        }
+
+        return $categorias;
     }
 
     public function buscarPorId(int $id): ?Categoria

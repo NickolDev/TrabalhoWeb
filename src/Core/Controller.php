@@ -9,12 +9,10 @@ namespace App\Core;
  */
 abstract class Controller
 {
-    private ?View $view = null;
-
     protected function render(string $template, array $dados = []): void
     {
-        $this->view ??= new View();
-        echo $this->view->render($template, $dados);
+        $view = new View();
+        echo $view->render($template, $dados);
     }
 
     protected function redirecionar(string $caminho): void
@@ -58,13 +56,15 @@ abstract class Controller
         }
     }
 
-    protected function post(string $campo): string
+    /** Lê um campo enviado pelo formulário (POST), já sem espaços nas pontas. */
+    protected function campoPost(string $campo): string
     {
         $valor = $_POST[$campo] ?? '';
         return is_string($valor) ? trim($valor) : '';
     }
 
-    protected function query(string $campo): string
+    /** Lê um parâmetro da URL (GET), ex.: ?categoria=2 */
+    protected function parametroGet(string $campo): string
     {
         $valor = $_GET[$campo] ?? '';
         return is_string($valor) ? trim($valor) : '';

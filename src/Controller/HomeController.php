@@ -13,10 +13,13 @@ class HomeController extends Controller
     {
         $categorias = (new CategoriaDAO())->listar();
 
-        $categoriaId = filter_var($this->query('categoria'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-        $categoriaId = $categoriaId === false ? null : $categoriaId;
+        // (int) transforma qualquer coisa estranha ("abc", "1 OR 1=1") em número; 0 = sem filtro
+        $categoriaId = (int) $this->parametroGet('categoria');
+        if ($categoriaId <= 0) {
+            $categoriaId = null;
+        }
 
-        $busca = $this->query('busca');
+        $busca = $this->parametroGet('busca');
 
         $itens = (new ItemDAO())->listarDisponiveis($categoriaId, $busca);
 

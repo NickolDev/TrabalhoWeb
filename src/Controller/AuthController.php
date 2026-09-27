@@ -34,8 +34,8 @@ class AuthController extends Controller
     {
         $this->validarCsrf();
 
-        $nome        = $this->post('nome');
-        $email       = $this->post('email');
+        $nome        = $this->campoPost('nome');
+        $email       = $this->campoPost('email');
         $senha       = $_POST['senha'] ?? '';
         $confirmacao = $_POST['confirmacao'] ?? '';
         $antigos     = ['nome' => $nome, 'email' => $email];
@@ -77,7 +77,7 @@ class AuthController extends Controller
     {
         $this->validarCsrf();
 
-        $email = $this->post('email');
+        $email = $this->campoPost('email');
         $senha = $_POST['senha'] ?? '';
 
         $usuario = $this->usuarios->buscarPorEmail($email);
@@ -85,12 +85,6 @@ class AuthController extends Controller
         // Mensagem genérica: não revela se o e-mail existe ou não
         if ($usuario === null || !is_string($senha) || !$usuario->verificarSenha($senha)) {
             $this->voltarComErro('/login', 'E-mail ou senha incorretos.', ['email' => $email]);
-        }
-
-        // Se o PHP passou a usar um algoritmo mais forte, atualiza o hash salvo
-        if ($usuario->precisaRehash()) {
-            $usuario->definirSenha($senha);
-            $this->usuarios->atualizarSenha($usuario);
         }
 
         Session::login($usuario->getId(), $usuario->getNome());
