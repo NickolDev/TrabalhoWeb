@@ -214,7 +214,9 @@ abstract class Item
         if ($nome === '') {
             throw new InvalidArgumentException('Informe o nome do item.');
         }
-        if (mb_strlen($nome) > 120) {
+        // strlen() conta bytes. Letras acentuadas ocupam 2 bytes em UTF-8, então este limite
+        // é um pouco mais rígido que o VARCHAR(120) do banco — nunca deixa passar texto maior.
+        if (strlen($nome) > 120) {
             throw new InvalidArgumentException('O nome do item deve ter no máximo 120 caracteres.');
         }
 
@@ -225,7 +227,7 @@ abstract class Item
     {
         $descricao = $descricao !== null ? trim($descricao) : null;
 
-        if ($descricao !== null && mb_strlen($descricao) > 2000) {
+        if ($descricao !== null && strlen($descricao) > 2000) {
             throw new InvalidArgumentException('A descrição deve ter no máximo 2000 caracteres.');
         }
 

@@ -16,7 +16,7 @@ class HomeController extends Controller
         $categoriaId = filter_var($this->query('categoria'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $categoriaId = $categoriaId === false ? null : $categoriaId;
 
-        $busca = mb_substr($this->query('busca'), 0, 100);
+        $busca = $this->query('busca');
 
         $itens = (new ItemDAO())->listarDisponiveis($categoriaId, $busca);
 

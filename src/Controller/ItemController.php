@@ -153,7 +153,7 @@ class ItemController extends Controller
 
         if ($item->estaDisponivel()) {
             $item->concluir();
-            $mensagem = 'Item marcado como ' . mb_strtolower($item->getRotuloConcluido()) . '. Ele não aparece mais na listagem pública.';
+            $mensagem = 'Item marcado como ' . strtolower($item->getRotuloConcluido()) . '. Ele não aparece mais na listagem pública.';
         } else {
             $item->reabrir();
             $mensagem = 'Item disponível novamente na listagem.';

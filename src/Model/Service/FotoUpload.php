@@ -9,7 +9,7 @@ use InvalidArgumentException;
  * Upload da foto do item (requisito bônus).
  *
  * Segurança:
- * - o tipo é verificado pelo CONTEÚDO do arquivo (finfo), não pela extensão enviada;
+ * - o tipo é verificado pelo CONTEÚDO do arquivo (getimagesize), não pela extensão enviada;
  * - o nome do arquivo é gerado aleatoriamente (o nome original é descartado);
  * - a pasta uploads/ tem .htaccess que impede executar PHP.
  */
@@ -45,10 +45,12 @@ class FotoUpload
             throw new InvalidArgumentException('Upload inválido.');
         }
 
-        $tipos = Config::get('upload.tipos_permitidos', []);
-        $mime  = (new \finfo(FILEINFO_MIME_TYPE))->file($arquivo['tmp_name']);
+        // getimagesize() lê o cabeçalho do arquivo: se não for imagem de verdade, retorna false.
+        // Assim, um "virus.php" renomeado para "foto.jpg" é recusado.
+        $tipos  = Config::get('upload.tipos_permitidos', []);
+        $imagem = getimagesize($arquivo['tmp_name']);
 
-        if (!isset($tipos[$mime])) {
+        if ($imagem === false || !isset($tipos[$imagem['mime']])) {
             throw new InvalidArgumentException('Formato de imagem não suportado. Envie JPG, PNG ou WEBP.');
         }
 
@@ -56,7 +58,7 @@ class FotoUpload
             throw new \RuntimeException('Não foi possível criar a pasta de uploads.');
         }
 
-        $nome = bin2hex(random_bytes(16)) . '.' . $tipos[$mime];
+        $nome = bin2hex(random_bytes(16)) . '.' . $tipos[$imagem['mime']];
 
         if (!move_uploaded_file($arquivo['tmp_name'], $this->pasta . '/' . $nome)) {
             throw new \RuntimeException('Não foi possível salvar a foto. Verifique a permissão da pasta public/uploads.');

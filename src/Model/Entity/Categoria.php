@@ -34,7 +34,7 @@ class Categoria
     {
         $nome = trim($nome);
 
-        if ($nome === '' || mb_strlen($nome) > 60) {
+        if ($nome === '' || strlen($nome) > 60) {
             throw new InvalidArgumentException('Nome de categoria inválido.');
         }
 

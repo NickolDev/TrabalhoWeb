@@ -175,9 +175,9 @@ textarea { resize: vertical; }
 .card__foto .selo { position: absolute; top: 10px; left: 10px; }
 .card__sem-foto {
     display: grid; place-items: center; width: 100%; height: 100%;
-    font-size: 3rem; font-weight: 800; color: #b9b2a3;
+    font-size: .95rem; font-weight: 600; color: #a39b8b; letter-spacing: .03em;
 }
-.card__sem-foto--grande { font-size: 6rem; }
+.card__sem-foto--grande { font-size: 1.2rem; }
 .card__corpo { padding: 14px 16px 16px; }
 .card__categoria { margin: 0 0 2px; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
 .card__titulo { font-size: 1.05rem; margin: 0 0 6px; }

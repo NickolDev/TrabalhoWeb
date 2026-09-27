@@ -18,7 +18,7 @@ class UsuarioDAO extends DAO
     public function buscarPorEmail(string $email): ?Usuario
     {
         $stmt = $this->pdo->prepare('SELECT * FROM usuarios WHERE email = :email');
-        $stmt->execute(['email' => mb_strtolower(trim($email))]);
+        $stmt->execute(['email' => strtolower(trim($email))]);
         $linha = $stmt->fetch();
 
         return $linha ? Usuario::deLinha($linha) : null;
@@ -27,7 +27,7 @@ class UsuarioDAO extends DAO
     public function emailExiste(string $email): bool
     {
         $stmt = $this->pdo->prepare('SELECT 1 FROM usuarios WHERE email = :email');
-        $stmt->execute(['email' => mb_strtolower(trim($email))]);
+        $stmt->execute(['email' => strtolower(trim($email))]);
 
         return (bool) $stmt->fetchColumn();
     }

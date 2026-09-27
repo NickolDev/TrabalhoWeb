@@ -25,7 +25,7 @@ PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · deploy em VM Linux 
 
 ### Bônus (todos implementados)
 
-- **Upload de foto do item** — `Model/Service/FotoUpload.php` (valida o tipo real do arquivo, limita a 2 MB, gera nome aleatório).
+- **Upload de foto do item** — `Model/Service/FotoUpload.php` (confere com `getimagesize()` se o arquivo é mesmo uma imagem, limita a 2 MB, gera nome aleatório).
 - **Marcar como "já doado/trocado"** — o item sai da listagem pública e pode ser reaberto (`ItemController::alternarStatus()`).
 - **Painel do usuário** — quantidade de itens cadastrados, disponíveis, concluídos e interesses recebidos, além da lista de itens em que o usuário tem interesse (`PainelController`).
 
@@ -102,7 +102,7 @@ Navegador → public/.htaccess → public/index.php (Front Controller)
 | CSRF | Token por sessão em todos os `POST`, comparado com `hash_equals()` |
 | Sequestro de sessão | `session_regenerate_id()` no login, cookie `HttpOnly` + `SameSite=Lax` |
 | Acesso a item alheio | Checagem no Controller **e** `WHERE usuario_id = ?` no SQL (retorna 403) |
-| Upload malicioso | Tipo verificado pelo conteúdo (`finfo`), nome aleatório, PHP desativado em `uploads/` |
+| Upload malicioso | Tipo verificado pelo conteúdo (`getimagesize`), nome aleatório, PHP desativado em `uploads/` |
 | Exposição de código | Só `public/` é acessível; `config.php` fora do Git |
 
 ---
@@ -148,7 +148,7 @@ O `.htaccess` da raiz redireciona tudo para `public/`, então não é preciso co
 Resumo — o passo a passo completo, com os comandos e a solução de problemas comuns, está em **[docs/DEPLOY.md](docs/DEPLOY.md)**.
 
 1. VM **e2-micro** com **Ubuntu 22.04 LTS**, tráfego HTTP liberado, região `us-central1`/`us-east1`/`us-west1`.
-2. `sudo apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring mysql-server git`
+2. `sudo apt install -y apache2 php libapache2-mod-php php-mysql mysql-server git` (o mesmo comando do enunciado)
 3. `mysql_secure_installation`, criação do banco `bazar_universitario` e do usuário `bazar_app`.
 4. `git clone` em `/var/www/html`, `sudo mysql < database/schema.sql`, criação do `config/config.php` com `debug => false`.
 5. `DocumentRoot /var/www/html/public` + `AllowOverride All` + `a2enmod rewrite` (arquivo pronto em `deploy/000-default.conf`).

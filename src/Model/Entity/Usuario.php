@@ -34,7 +34,7 @@ class Usuario
     /** Cria um novo usuário a partir da senha digitada, já gerando o hash. */
     public static function registrar(string $nome, string $email, string $senhaPura): self
     {
-        if (mb_strlen($senhaPura) < 6) {
+        if (strlen($senhaPura) < 6) {
             throw new InvalidArgumentException('A senha deve ter pelo menos 6 caracteres.');
         }
 
@@ -100,7 +100,7 @@ class Usuario
     {
         $nome = trim($nome);
 
-        if ($nome === '' || mb_strlen($nome) > 100) {
+        if ($nome === '' || strlen($nome) > 100) {
             throw new InvalidArgumentException('Informe um nome com até 100 caracteres.');
         }
 
@@ -109,9 +109,9 @@ class Usuario
 
     public function setEmail(string $email): void
     {
-        $email = mb_strtolower(trim($email));
+        $email = strtolower(trim($email));
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 150) {
             throw new InvalidArgumentException('Informe um e-mail válido.');
         }
 

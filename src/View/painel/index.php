@@ -72,7 +72,7 @@
                                     <?= $this->csrf() ?>
                                     <input type="hidden" name="voltar" value="painel">
                                     <button type="submit" class="link-botao">
-                                        <?= $item->estaDisponivel() ? 'Marcar ' . $this->e(mb_strtolower($item->getRotuloConcluido())) : 'Reabrir' ?>
+                                        <?= $item->estaDisponivel() ? 'Marcar ' . $this->e(strtolower($item->getRotuloConcluido())) : 'Reabrir' ?>
                                     </button>
                                 </form>
                                 <form action="<?= $this->url('/itens/' . $item->getId() . '/remover') ?>" method="post"

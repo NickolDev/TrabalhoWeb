@@ -24,10 +24,10 @@ Conecte pelo botão **SSH** ao lado da instância e rode:
 
 ```bash
 sudo apt update
-sudo apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring mysql-server git
+sudo apt install -y apache2 php libapache2-mod-php php-mysql mysql-server git
 ```
 
-> `php-mbstring` não está no enunciado, mas o projeto usa as funções `mb_*` (para tratar acentos corretamente), então ele é necessário.
+> É exatamente o comando do enunciado: o projeto só usa funções que já vêm no PHP padrão do Ubuntu (não precisa de `php-mbstring` nem de outras extensões).
 
 Confira a versão do PHP (precisa ser 8+; no Ubuntu 22.04 vem a 8.1):
 
@@ -194,7 +194,6 @@ sudo -u www-data git pull
 | Aparece a listagem de arquivos do projeto | `DocumentRoot` ainda aponta para `/var/www/html` | Ajuste para `/var/www/html/public` |
 | "Arquivo config/config.php não encontrado" | Faltou copiar o exemplo | `sudo cp config/config.example.php config/config.php` |
 | "Erro 500" genérico | Senha do banco errada, extensão faltando etc. | Veja o log: `sudo tail -n 30 /var/log/apache2/error.log` |
-| `Call to undefined function mb_strlen()` | Falta o `php-mbstring` | `sudo apt install -y php-mbstring && sudo systemctl restart apache2` |
 | "Não foi possível salvar a foto" | Permissão da pasta de uploads | `sudo chown -R www-data:www-data /var/www/html/public/uploads` |
 | Site fora do ar e SSH lento | MySQL sem memória | Crie o swap do passo 2 e `sudo systemctl restart mysql` |
 | Acentos aparecem como `Ã§` | Script SQL importado com charset errado | Recrie o banco e rode o `schema.sql` de novo (ele já tem `SET NAMES utf8mb4`) |

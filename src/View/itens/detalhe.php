@@ -15,7 +15,7 @@
         <?php if ($item->getFoto()): ?>
             <img src="<?= $this->url('/uploads/' . $item->getFoto()) ?>" alt="Foto de <?= $this->e($item->getNome()) ?>">
         <?php else: ?>
-            <span class="card__sem-foto card__sem-foto--grande" aria-hidden="true"><?= $this->e(mb_strtoupper(mb_substr($item->getNome(), 0, 1))) ?></span>
+            <span class="card__sem-foto card__sem-foto--grande">Sem foto</span>
         <?php endif; ?>
     </div>
 
@@ -51,7 +51,7 @@
                 <form action="<?= $this->url('/itens/' . $item->getId() . '/status') ?>" method="post">
                     <?= $this->csrf() ?>
                     <button type="submit" class="botao botao--secundario">
-                        <?= $item->estaDisponivel() ? 'Marcar como ' . $this->e(mb_strtolower($item->getRotuloConcluido())) : 'Disponibilizar novamente' ?>
+                        <?= $item->estaDisponivel() ? 'Marcar como ' . $this->e(strtolower($item->getRotuloConcluido())) : 'Disponibilizar novamente' ?>
                     </button>
                 </form>
 
@@ -62,7 +62,7 @@
                 </form>
 
             <?php elseif (!$item->estaDisponivel()): ?>
-                <p class="alerta alerta--aviso">Este item já foi <?= $this->e(mb_strtolower($item->getRotuloConcluido())) ?>.</p>
+                <p class="alerta alerta--aviso">Este item já foi <?= $this->e(strtolower($item->getRotuloConcluido())) ?>.</p>
 
             <?php elseif (!$this->usuarioLogado()): ?>
                 <a href="<?= $this->url('/login') ?>" class="botao">Entre para demonstrar interesse</a>
