@@ -61,7 +61,7 @@ class ItemController extends Controller
             'item'       => null,
             'categorias' => $this->categorias->listar(),
             'tipos'      => Item::tiposDisponiveis(),
-            'antigos'    => Session::consumirAntigos(),
+            'valores'    => $this->valoresDoFormulario(null, Session::consumirAntigos()),
             'acao'       => '/itens',
         ]);
     }
@@ -102,7 +102,7 @@ class ItemController extends Controller
             'item'       => $item,
             'categorias' => $this->categorias->listar(),
             'tipos'      => Item::tiposDisponiveis(),
-            'antigos'    => Session::consumirAntigos(),
+            'valores'    => $this->valoresDoFormulario($item, Session::consumirAntigos()),
             'acao'       => '/itens/' . $id . '/editar',
         ]);
     }
@@ -211,6 +211,33 @@ class ItemController extends Controller
             'categoria_id' => $this->post('categoria_id'),
             'tipo'         => $this->post('tipo'),
         ];
+    }
+
+    /**
+     * Valores que aparecem preenchidos no formulário.
+     * Prioridade: o que o usuário digitou antes de um erro > dados do item (edição) > vazio.
+     */
+    private function valoresDoFormulario(?Item $item, array $antigos): array
+    {
+        if ($antigos !== []) {
+            return [
+                'nome'         => $antigos['nome'],
+                'descricao'    => $antigos['descricao'],
+                'categoria_id' => (int) $antigos['categoria_id'],
+                'tipo'         => $antigos['tipo'],
+            ];
+        }
+
+        if ($item !== null) {
+            return [
+                'nome'         => $item->getNome(),
+                'descricao'    => (string) $item->getDescricao(),
+                'categoria_id' => $item->getCategoriaId(),
+                'tipo'         => $item->getTipo(),
+            ];
+        }
+
+        return ['nome' => '', 'descricao' => '', 'categoria_id' => 0, 'tipo' => ''];
     }
 
     private function montarItem(?int $id, int $usuarioId, array $dados, string $status, ?string $foto): Item

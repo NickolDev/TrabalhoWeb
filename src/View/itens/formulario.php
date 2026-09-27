@@ -6,19 +6,11 @@
  * @var ?\App\Model\Entity\Item $item
  * @var \App\Model\Entity\Categoria[] $categorias
  * @var array $tipos
- * @var array $antigos  dados digitados antes de um erro de validação
+ * @var array $valores  valores já preenchidos (montados no ItemController)
  * @var string $acao
  */
-
-// Prioridade: o que o usuário digitou (após erro) > dados do item (edição) > vazio
-$valor = [
-    'nome'         => $antigos['nome']         ?? $item?->getNome()        ?? '',
-    'descricao'    => $antigos['descricao']    ?? $item?->getDescricao()   ?? '',
-    'categoria_id' => (int) ($antigos['categoria_id'] ?? $item?->getCategoriaId() ?? 0),
-    'tipo'         => $antigos['tipo']         ?? $item?->getTipo()        ?? '',
-];
 ?>
-<a href="<?= $this->url($item ? '/itens/' . $item->getId() : '/painel') ?>" class="voltar">← Voltar</a>
+<a href="<?= $this->url($item !== null ? '/itens/' . $item->getId() : '/painel') ?>" class="voltar">← Voltar</a>
 
 <section class="formulario-caixa">
     <h1><?= $this->e($titulo) ?></h1>
@@ -28,12 +20,12 @@ $valor = [
 
         <label>
             Nome do item *
-            <input type="text" name="nome" value="<?= $this->e($valor['nome']) ?>" maxlength="120" required>
+            <input type="text" name="nome" value="<?= $this->e($valores['nome']) ?>" maxlength="120" required>
         </label>
 
         <label>
             Descrição
-            <textarea name="descricao" rows="5" maxlength="2000" placeholder="Estado de conservação, detalhes, o que aceita em troca..."><?= $this->e($valor['descricao']) ?></textarea>
+            <textarea name="descricao" rows="5" maxlength="2000" placeholder="Estado de conservação, detalhes, o que aceita em troca..."><?= $this->e($valores['descricao']) ?></textarea>
         </label>
 
         <div class="formulario__linha">
@@ -42,7 +34,7 @@ $valor = [
                 <select name="categoria_id" required>
                     <option value="">Selecione...</option>
                     <?php foreach ($categorias as $categoria): ?>
-                        <option value="<?= $this->e($categoria->getId()) ?>" <?= $categoria->getId() === $valor['categoria_id'] ? 'selected' : '' ?>>
+                        <option value="<?= $this->e($categoria->getId()) ?>" <?= $categoria->getId() === $valores['categoria_id'] ? 'selected' : '' ?>>
                             <?= $this->e($categoria->getNome()) ?>
                         </option>
                     <?php endforeach; ?>
@@ -53,7 +45,7 @@ $valor = [
                 <legend>Tipo *</legend>
                 <?php foreach ($tipos as $chave => $rotulo): ?>
                     <label class="opcao">
-                        <input type="radio" name="tipo" value="<?= $this->e($chave) ?>" <?= $valor['tipo'] === $chave ? 'checked' : '' ?> required>
+                        <input type="radio" name="tipo" value="<?= $this->e($chave) ?>" <?= $valores['tipo'] === $chave ? 'checked' : '' ?> required>
                         <?= $this->e($rotulo) ?>
                     </label>
                 <?php endforeach; ?>
@@ -66,19 +58,19 @@ $valor = [
         </label>
 
         <div class="preview" data-preview>
-            <?php if ($item?->getFoto()): ?>
+            <?php if ($item !== null && $item->getFoto()): ?>
                 <img src="<?= $this->url('/uploads/' . $item->getFoto()) ?>" alt="Foto atual">
             <?php endif; ?>
         </div>
 
-        <?php if ($item?->getFoto()): ?>
+        <?php if ($item !== null && $item->getFoto()): ?>
             <label class="opcao">
                 <input type="checkbox" name="remover_foto" value="1"> Remover a foto atual
             </label>
         <?php endif; ?>
 
         <div class="formulario__acoes">
-            <button type="submit" class="botao"><?= $item ? 'Salvar alterações' : 'Publicar item' ?></button>
+            <button type="submit" class="botao"><?= $item !== null ? 'Salvar alterações' : 'Publicar item' ?></button>
         </div>
     </form>
 </section>
