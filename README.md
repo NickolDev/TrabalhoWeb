@@ -98,7 +98,7 @@ Navegador → public/.htaccess → public/index.php (Front Controller)
 |---|---|
 | SQL Injection | 100% das queries com `prepare()` + parâmetros; `PDO::ATTR_EMULATE_PREPARES = false` |
 | XSS | Toda saída passa por `$this->e()` → `htmlspecialchars(ENT_QUOTES, 'UTF-8')` |
-| Senhas | `password_hash()` / `password_verify()` (+ rehash automático) |
+| Senhas | `password_hash()` no cadastro e `password_verify()` no login |
 | CSRF | Token por sessão em todos os `POST`, comparado com `hash_equals()` |
 | Sequestro de sessão | `session_regenerate_id()` no login, cookie `HttpOnly` + `SameSite=Lax` |
 | Acesso a item alheio | Checagem no Controller **e** `WHERE usuario_id = ?` no SQL (retorna 403) |
