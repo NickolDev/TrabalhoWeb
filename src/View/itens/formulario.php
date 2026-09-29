@@ -59,7 +59,7 @@
 
         <div class="preview" data-preview>
             <?php if ($item !== null && $item->getFoto()): ?>
-                <img src="<?= $this->url('/uploads/' . $item->getFoto()) ?>" alt="Foto atual">
+                <img src="<?= $this->url('/fotos/' . $item->getFoto()) ?>" alt="Foto atual">
             <?php endif; ?>
         </div>
 

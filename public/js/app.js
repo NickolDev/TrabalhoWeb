@@ -34,6 +34,14 @@
             if (!arquivo) {
                 return;
             }
+            // Só um aviso antecipado: quem garante o limite de 2 MB é o PHP (FotoUpload).
+            // Na Vercel, arquivos acima de 4,5 MB nem chegam ao PHP.
+            if (arquivo.size > 2 * 1024 * 1024) {
+                window.alert('A foto deve ter no máximo 2 MB.');
+                campoFoto.value = '';
+                preview.replaceChildren();
+                return;
+            }
             var img = document.createElement('img');
             img.alt = 'Pré-visualização';
             img.src = URL.createObjectURL(arquivo);

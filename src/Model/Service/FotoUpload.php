@@ -3,28 +3,32 @@
 namespace App\Model\Service;
 
 use App\Core\Config;
+use App\Model\DAO\FotoDAO;
 use InvalidArgumentException;
 
 /**
  * Upload da foto do item (requisito bônus).
  *
+ * A imagem é guardada no banco (tabela `fotos`), e não numa pasta, porque
+ * na Vercel o disco é somente leitura. Ela é exibida pela rota /fotos/{arquivo}.
+ *
  * Segurança:
  * - o tipo é verificado pelo CONTEÚDO do arquivo (getimagesize), não pela extensão enviada;
- * - o nome do arquivo é gerado aleatoriamente (o nome original é descartado);
- * - a pasta uploads/ tem .htaccess que impede executar PHP.
+ * - o nome é gerado aleatoriamente (o nome original é descartado);
+ * - como nada é gravado em disco, não há como enviar um .php e executá-lo.
  */
 class FotoUpload
 {
-    private string $pasta;
+    private FotoDAO $fotos;
 
-    public function __construct(?string $pasta = null)
+    public function __construct()
     {
-        $this->pasta = $pasta ?? dirname(__DIR__, 3) . '/public/uploads';
+        $this->fotos = new FotoDAO();
     }
 
     /**
      * Salva a foto enviada no campo do formulário.
-     * Retorna o nome do arquivo salvo, ou null se nenhum arquivo foi enviado.
+     * Retorna o nome gerado para a foto, ou null se nenhum arquivo foi enviado.
      */
     public function salvar(?array $arquivo): ?string
     {
@@ -54,29 +58,17 @@ class FotoUpload
             throw new InvalidArgumentException('Formato de imagem não suportado. Envie JPG, PNG ou WEBP.');
         }
 
-        if (!is_dir($this->pasta) && !mkdir($this->pasta, 0775, true)) {
-            throw new \RuntimeException('Não foi possível criar a pasta de uploads.');
-        }
-
         $nome = bin2hex(random_bytes(16)) . '.' . $tipos[$imagem['mime']];
 
-        if (!move_uploaded_file($arquivo['tmp_name'], $this->pasta . '/' . $nome)) {
-            throw new \RuntimeException('Não foi possível salvar a foto. Verifique a permissão da pasta public/uploads.');
-        }
+        $this->fotos->salvar($nome, $imagem['mime'], file_get_contents($arquivo['tmp_name']));
 
         return $nome;
     }
 
     public function remover(?string $nome): void
     {
-        // basename() impede caminhos como "../../config/config.php"
-        if ($nome === null || $nome === '' || $nome !== basename($nome)) {
-            return;
-        }
-
-        $caminho = $this->pasta . '/' . $nome;
-        if (is_file($caminho)) {
-            unlink($caminho);
+        if ($nome !== null && $nome !== '') {
+            $this->fotos->remover($nome);
         }
     }
 

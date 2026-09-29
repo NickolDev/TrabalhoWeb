@@ -13,7 +13,7 @@
 <article class="detalhe">
     <div class="detalhe__foto">
         <?php if ($item->getFoto()): ?>
-            <img src="<?= $this->url('/uploads/' . $item->getFoto()) ?>" alt="Foto de <?= $this->e($item->getNome()) ?>">
+            <img src="<?= $this->url('/fotos/' . $item->getFoto()) ?>" alt="Foto de <?= $this->e($item->getNome()) ?>">
         <?php else: ?>
             <span class="card__sem-foto card__sem-foto--grande">Sem foto</span>
         <?php endif; ?>

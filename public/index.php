@@ -2,11 +2,12 @@
 
 /**
  * Front Controller — TODA requisição passa por aqui.
- * O .htaccess redireciona as URLs amigáveis para este arquivo,
- * que carrega as configurações, registra as rotas e chama o Router.
+ * No XAMPP quem manda para cá é o .htaccess; na Vercel é o api/index.php.
+ * Este arquivo carrega as configurações, registra as rotas e chama o Router.
  */
 
 use App\Controller\AuthController;
+use App\Controller\FotoController;
 use App\Controller\HomeController;
 use App\Controller\InteresseController;
 use App\Controller\ItemController;
@@ -28,8 +29,6 @@ $debug = (bool) Config::get('app.debug', false);
 ini_set('display_errors', $debug ? '1' : '0');
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');
-
-Session::iniciar();
 
 // ---------------- Rotas ----------------
 $router = new Router();
@@ -60,10 +59,18 @@ $router->post('/itens/{id}/interesse/remover', [InteresseController::class, 'rem
 // Painel do usuário
 $router->get('/painel', [PainelController::class, 'index']);
 
+// Fotos dos itens (guardadas no banco)
+$router->get('/fotos/{arquivo}', [FotoController::class, 'mostrar']);
+
 // ---------------- Despacho ----------------
 $caminho = Url::resolverCaminho($_SERVER['SCRIPT_NAME'] ?? '/index.php', $_SERVER['REQUEST_URI'] ?? '/');
 
 try {
+    // As fotos são públicas e não usam login: não precisam abrir a sessão
+    if (!str_starts_with($caminho, '/fotos/')) {
+        Session::iniciar();
+    }
+
     $router->despachar($_SERVER['REQUEST_METHOD'] ?? 'GET', $caminho);
 } catch (HttpException $e) {
     http_response_code($e->getCode());

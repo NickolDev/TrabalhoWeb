@@ -8,7 +8,7 @@
     <a href="<?= $this->url('/itens/' . $item->getId()) ?>" class="card__link">
         <div class="card__foto">
             <?php if ($item->getFoto()): ?>
-                <img src="<?= $this->url('/uploads/' . $item->getFoto()) ?>" alt="Foto de <?= $this->e($item->getNome()) ?>" loading="lazy">
+                <img src="<?= $this->url('/fotos/' . $item->getFoto()) ?>" alt="Foto de <?= $this->e($item->getNome()) ?>" loading="lazy">
             <?php else: ?>
                 <span class="card__sem-foto">Sem foto</span>
             <?php endif; ?>
