@@ -12,11 +12,11 @@ Guia para publicar o Bazar Universitário numa VM **e2-micro (Always Free)** com
 2. **Compute Engine → Instâncias de VM → Criar instância**.
 3. Série **E2**, tipo **e2-micro**.
 4. Região elegível ao Always Free: `us-west1`, `us-central1` ou `us-east1`.
-5. Disco de inicialização: **Ubuntu 22.04 LTS** (disco padrão de até 30 GB continua no nível gratuito).
+5. Disco de inicialização: clique em **Alterar**, escolha **Ubuntu 22.04 LTS (x86/64)** e, em **Tipo de disco**, troque para **Disco permanente padrão** (*Standard persistent disk*). O que vem marcado é o **equilibrado** (*Balanced*), que **não** é gratuito. Até 30 GB entram no nível gratuito; 10 GB bastam.
 6. Em Firewall, marque **Permitir tráfego HTTP**.
 7. Clique em **Criar** e anote o **IP externo**.
 
-> Dica: em **Rede VPC → Endereços IP**, dá para "reservar" o IP externo como estático, para ele não mudar se a VM reiniciar. (IP estático parado sem VM ligada é cobrado — se apagar a VM, libere o IP.)
+> **Custos:** a e2-micro e o disco padrão entram no nível gratuito (*Always Free*), mas o Google cobra à parte o IP externo (IPv4): US$ 0,005 por hora, cerca de US$ 3,60 por mês. Conta nova ganha US$ 300 de crédito por 90 dias, que cobre isso com folga durante o semestre. Configure o alerta de orçamento (passo 5) e apague a VM depois da nota. Não reserve IP estático: parado, ele custa o dobro.
 
 ## Passo 2 — Instalar o LAMP
 
@@ -54,6 +54,8 @@ sudo mysql_secure_installation
 ```
 
 Respostas sugeridas: ativar validação de senha (opcional), remover usuários anônimos **Y**, desabilitar login remoto do root **Y**, remover banco de teste **Y**, recarregar privilégios **Y**.
+
+> Se ele pedir para trocar a senha do root e ficar repetindo o erro `SET PASSWORD has no significance for user 'root'@'localhost'`, aperte `Ctrl+C`. No Ubuntu o root do MySQL entra pelo `sudo` (autenticação *auth_socket*) e não precisa de senha. Siga para o `sudo mysql` abaixo.
 
 Crie o banco e o usuário da aplicação (troque a senha!):
 
