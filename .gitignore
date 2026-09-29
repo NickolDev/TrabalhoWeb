@@ -1,10 +1,5 @@
-# Configuração local (contém a senha do banco) — nunca versionar
-config/config.php
-
-# Fotos enviadas pelos usuários
-public/uploads/*
-!public/uploads/.gitkeep
-!public/uploads/.htaccess
+# Pasta criada pela Vercel CLI (configuração local do projeto)
+.vercel/
 
 # IDEs e sistema
 .idea/

@@ -14,7 +14,7 @@ final class Config
     {
         if (!is_file($arquivo)) {
             http_response_code(500);
-            exit('Arquivo config/config.php não encontrado. Copie config/config.example.php para config/config.php.');
+            exit('Arquivo config/config.php não encontrado.');
         }
 
         self::$valores = require $arquivo;
