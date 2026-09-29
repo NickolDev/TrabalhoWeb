@@ -6,7 +6,12 @@ Trabalho final da disciplina **AB722 — Programação para Web II**.
 PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · publicado na Vercel (autorizado pelo professor) com banco MySQL no Aiven.
 
 - **Aplicação publicada:** https://SEU-PROJETO.vercel.app  <!-- trocar pelo link real -->
-- **Autor(es):** Nickolas Goulart Galasso <!-- adicionar dupla, se houver -->
+- **Autores:**
+
+| Nome | RA |
+|---|---|
+| Nickolas Goulart Galasso | 842278 |
+| Pedro dos Anjos Sanches | 842621 |
 
 ---
 
