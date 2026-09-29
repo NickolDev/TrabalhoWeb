@@ -12,6 +12,7 @@ PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · publicado na Vercel
 |---|---|
 | Nickolas Goulart Galasso | 842278 |
 | Pedro dos Anjos Sanches | 842621 |
+| Felipe Martins Nascimento | 842399 |
 
 ---
 
