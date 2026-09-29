@@ -36,7 +36,7 @@ $dsn = sprintf('mysql:host=%s;port=%d;charset=utf8mb4', Config::get('db.host'), 
 
 try {
     $pdo = new PDO($dsn, Config::get('db.usuario'), Config::get('db.senha'), Database::opcoes());
-} catch (PDOException $e) {
+} catch (Exception $e) {
     exit('Não foi possível conectar em ' . Config::get('db.host') . ': ' . $e->getMessage() . PHP_EOL);
 }
 
