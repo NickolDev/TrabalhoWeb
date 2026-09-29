@@ -4,7 +4,7 @@ namespace App\Core;
 
 /**
  * Encapsula o uso de $_SESSION: login do usuário, mensagens "flash"
- * e dados antigos de formulário.
+ * e dados antigos de formulário. As sessões ficam no banco (SessaoNoBanco).
  */
 final class Session
 {
@@ -14,13 +14,24 @@ final class Session
             return;
         }
 
+        // Na Vercel o HTTPS termina antes do PHP; ela avisa pelo cabeçalho X-Forwarded-Proto
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+
         session_set_cookie_params([
             'lifetime' => 0,
             'path'     => '/',
-            'httponly' => true,                             // JS não lê o cookie
+            'httponly' => true,   // JS não lê o cookie
             'samesite' => 'Lax',
-            'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'secure'   => $https, // em HTTPS, o cookie só trafega criptografado
         ]);
+
+        // Sessão guardada no MySQL em vez de arquivo (ver SessaoNoBanco).
+        // A cada 100 acessos, em média, o PHP apaga as sessões paradas há mais de 24 min.
+        ini_set('session.gc_probability', '1');
+        ini_set('session.gc_divisor', '100');
+        session_set_save_handler(new SessaoNoBanco(Database::conexao()), true);
+
         session_name('BAZARSESSID');
         session_start();
     }
