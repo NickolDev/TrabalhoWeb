@@ -141,6 +141,8 @@ O `.htaccess` da raiz redireciona tudo para `public/`, então não é preciso co
 
 > Se as URLs como `/login` derem 404, confira se o `mod_rewrite` está ativo no `httpd.conf` do XAMPP (linha `LoadModule rewrite_module` sem `#`).
 
+> **XAMPP no Linux:** o Apache do XAMPP roda como o usuário `daemon`, que precisa gravar as fotos. Rode uma vez: `sudo chown -R daemon:daemon /opt/lampp/htdocs/bazar-universitario/public/uploads`. Sem isso, o cadastro de item com foto mostra "Não foi possível salvar a foto".
+
 ---
 
 ## Deploy na nuvem (Google Cloud)
