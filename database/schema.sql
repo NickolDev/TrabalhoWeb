@@ -2,9 +2,14 @@
 -- Bazar Universitário — criação do banco e das tabelas
 -- Baseado no "Modelo de dados sugerido" (seção 5 do enunciado), com
 -- três ajustes para os requisitos bônus e integridade:
---   1. itens.foto                  -> guarda o nome do arquivo da foto (bônus)
+--   1. itens.foto                  -> guarda o nome da foto do item (bônus)
 --   2. UNIQUE (item_id, usuario_id) -> o mesmo usuário não registra interesse 2x
 --   3. ON DELETE CASCADE            -> remover um item remove seus interesses
+--
+-- E duas tabelas de apoio, necessárias para rodar na Vercel
+-- (lá o disco é somente leitura e cada acesso pode cair num servidor diferente):
+--   - fotos   -> o conteúdo das imagens enviadas
+--   - sessoes -> as sessões de login do PHP
 -- =====================================================================
 
 -- Garante que os acentos sejam gravados corretamente
@@ -26,7 +31,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(60) NOT NULL
+    nome VARCHAR(60) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS itens (
@@ -54,8 +59,24 @@ CREATE TABLE IF NOT EXISTS interesses (
     UNIQUE KEY uk_interesse_item_usuario (item_id, usuario_id)
 ) ENGINE=InnoDB;
 
--- Categorias iniciais
-INSERT INTO categorias (nome) VALUES
+-- Fotos dos itens (bônus). O nome é o mesmo guardado em itens.foto.
+CREATE TABLE IF NOT EXISTS fotos (
+    nome VARCHAR(64) PRIMARY KEY,
+    tipo VARCHAR(20) NOT NULL,
+    dados MEDIUMBLOB NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Sessões de login (usadas pela classe Core/SessaoNoBanco)
+CREATE TABLE IF NOT EXISTS sessoes (
+    id VARCHAR(128) PRIMARY KEY,
+    dados MEDIUMBLOB NOT NULL,
+    atualizado_em INT UNSIGNED NOT NULL,
+    INDEX idx_sessoes_atualizado (atualizado_em)
+) ENGINE=InnoDB;
+
+-- Categorias iniciais (INSERT IGNORE: rodar o script de novo não duplica)
+INSERT IGNORE INTO categorias (nome) VALUES
     ('Livros'),
     ('Eletrônicos'),
     ('Material de Estudo'),
