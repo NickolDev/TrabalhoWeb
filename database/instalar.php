@@ -40,6 +40,9 @@ try {
     exit('Não foi possível conectar em ' . Config::get('db.host') . ': ' . $e->getMessage() . PHP_EOL);
 }
 
+// Mesmo fuso usado pela aplicação (Database::conexao), para as datas dos dados de exemplo baterem
+$pdo->exec("SET time_zone = '-03:00'");
+
 foreach ($arquivos as $arquivo) {
     echo 'Executando ' . basename($arquivo) . '...' . PHP_EOL;
 
