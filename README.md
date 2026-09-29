@@ -3,9 +3,9 @@
 Aplicação web onde estudantes cadastram itens (livros, materiais, eletrônicos) para **doar** ou **trocar**, e outros alunos podem navegar, filtrar por categoria e demonstrar interesse.
 
 Trabalho final da disciplina **AB722 — Programação para Web II**.
-PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · deploy em VM Linux no Google Cloud.
+PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · publicado na Vercel (autorizado pelo professor) com banco MySQL no Aiven.
 
-- **Aplicação publicada:** http://SEU-IP-OU-DUCKDNS/  <!-- trocar pelo link real -->
+- **Aplicação publicada:** https://SEU-PROJETO.vercel.app  <!-- trocar pelo link real -->
 - **Autor(es):** Nickolas Goulart Galasso <!-- adicionar dupla, se houver -->
 
 ---
@@ -25,7 +25,7 @@ PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · deploy em VM Linux 
 
 ### Bônus (todos implementados)
 
-- **Upload de foto do item** — `Model/Service/FotoUpload.php` (confere com `getimagesize()` se o arquivo é mesmo uma imagem, limita a 2 MB, gera nome aleatório).
+- **Upload de foto do item** — `Model/Service/FotoUpload.php` (confere com `getimagesize()` se o arquivo é mesmo uma imagem, limita a 2 MB, gera nome aleatório e guarda a imagem na tabela `fotos`, exibida pela rota `/fotos/{arquivo}`).
 - **Marcar como "já doado/trocado"** — o item sai da listagem pública e pode ser reaberto (`ItemController::alternarStatus()`).
 - **Painel do usuário** — quantidade de itens cadastrados, disponíveis, concluídos e interesses recebidos, além da lista de itens em que o usuário tem interesse (`PainelController`).
 
@@ -35,9 +35,10 @@ Extras: o dono vê **quem** demonstrou interesse (nome e e-mail para contato), p
 
 ## Tecnologias
 
-- PHP 8.1+ (sem frameworks e sem Composer)
+- PHP 8.1+ (sem frameworks e sem Composer) — testado do 8.1 ao 8.5
 - MySQL 8 / MariaDB via **PDO** com **prepared statements**
-- Apache com `mod_rewrite`
+- Local: XAMPP (Apache com `mod_rewrite`)
+- Nuvem: **Vercel** (runtime `vercel-php`) + **Aiven** (MySQL gratuito, conexão com SSL)
 - HTML + CSS próprio + um pouco de JS (só interface)
 
 ---
@@ -46,12 +47,13 @@ Extras: o dono vê **quem** demonstrou interesse (nome e e-mail para contato), p
 
 ```
 bazar-universitario/
-├── public/                  ← única pasta exposta na web (DocumentRoot)
+├── public/                  ← única pasta exposta na web
 │   ├── index.php            ← Front Controller: toda requisição entra aqui
-│   ├── .htaccess            ← URLs amigáveis → index.php
+│   ├── .htaccess            ← (XAMPP) URLs amigáveis → index.php
 │   ├── css/style.css
-│   ├── js/app.js            ← só interface (menu, confirmação, preview da foto)
-│   └── uploads/             ← fotos dos itens (PHP bloqueado aqui)
+│   └── js/app.js            ← só interface (menu, confirmação, preview da foto)
+├── api/index.php            ← (Vercel) ponto de entrada; repassa para public/index.php
+├── vercel.json              ← (Vercel) /css e /js estáticos, o resto vai para api/index.php
 ├── src/
 │   ├── autoload.php         ← autoload PSR-4 (App\ → src/)
 │   ├── Core/                ← "motor" do MVC
@@ -60,26 +62,28 @@ bazar-universitario/
 │   │   ├── View.php         ← renderiza templates; e() = htmlspecialchars
 │   │   ├── Database.php     ← conexão PDO (Singleton)
 │   │   ├── Session.php      ← login, mensagens flash
+│   │   ├── SessaoNoBanco.php← guarda as sessões no MySQL (necessário na Vercel)
 │   │   ├── Csrf.php, Url.php, Config.php, HttpException.php
-│   ├── Controller/          ← Home, Auth, Item, Interesse, Painel
+│   ├── Controller/          ← Home, Auth, Item, Interesse, Painel, Foto
 │   ├── Model/
 │   │   ├── Entity/          ← Usuario, Categoria, Item (abstrata), ItemDoacao, ItemTroca, Interesse
 │   │   ├── DAO/             ← acesso ao banco (todas as queries com prepare/execute)
 │   │   └── Service/         ← FotoUpload
 │   └── View/                ← templates (layout, home, itens, auth, painel, erros)
 ├── config/
-│   └── config.example.php   ← copiar para config.php (este fica fora do Git)
+│   ├── config.php           ← lê as variáveis de ambiente (senha nunca fica no código)
+│   └── ca.pem               ← (Vercel) certificado do Aiven para a conexão SSL
 ├── database/
 │   ├── schema.sql           ← criação do banco e tabelas + categorias
-│   └── dados-exemplo.sql    ← (opcional) 2 usuários e 5 itens para demonstração
-├── deploy/000-default.conf  ← VirtualHost do Apache para a VM
-└── docs/DEPLOY.md           ← passo a passo do deploy no Google Cloud
+│   ├── dados-exemplo.sql    ← (opcional) 2 usuários e 5 itens para demonstração
+│   └── instalar.php         ← roda os .sql pelo terminal (local ou na nuvem)
+└── docs/DEPLOY.md           ← passo a passo do deploy na Vercel + Aiven
 ```
 
 ### Como uma requisição percorre o MVC
 
 ```
-Navegador → public/.htaccess → public/index.php (Front Controller)
+Navegador → public/.htaccess (XAMPP) ou api/index.php (Vercel) → public/index.php (Front Controller)
           → Router → Controller → DAO (Model) → MySQL
                               ↘ Entity (regras)   
           → View (template + layout, saída escapada) → HTML
@@ -100,10 +104,11 @@ Navegador → public/.htaccess → public/index.php (Front Controller)
 | XSS | Toda saída passa por `$this->e()` → `htmlspecialchars(ENT_QUOTES, 'UTF-8')` |
 | Senhas | `password_hash()` no cadastro e `password_verify()` no login |
 | CSRF | Token por sessão em todos os `POST`, comparado com `hash_equals()` |
-| Sequestro de sessão | `session_regenerate_id()` no login, cookie `HttpOnly` + `SameSite=Lax` |
+| Sequestro de sessão | `session_regenerate_id()` no login, cookie `HttpOnly` + `SameSite=Lax` + `Secure` em HTTPS |
 | Acesso a item alheio | Checagem no Controller **e** `WHERE usuario_id = ?` no SQL (retorna 403) |
-| Upload malicioso | Tipo verificado pelo conteúdo (`getimagesize`), nome aleatório, PHP desativado em `uploads/` |
-| Exposição de código | Só `public/` é acessível; `config.php` fora do Git |
+| Upload malicioso | Tipo verificado pelo conteúdo (`getimagesize`), nome aleatório, imagem guardada no banco (nada é gravado em disco) |
+| Exposição de código | Só `public/` é acessível; `src/`, `config/` e `database/` dão 404 |
+| Senha do banco | Fica só nas variáveis de ambiente da Vercel; a conexão com o Aiven é criptografada (SSL) |
 
 ---
 
@@ -123,6 +128,7 @@ Navegador → public/.htaccess → public/index.php (Front Controller)
 | POST | `/itens/{id}/interesse` | "Tenho interesse" | ✔ |
 | POST | `/itens/{id}/interesse/remover` | Cancelar interesse | ✔ |
 | GET | `/painel` | Painel do usuário | ✔ |
+| GET | `/fotos/{arquivo}` | Imagem de um item (guardada no banco) | — |
 
 ---
 
@@ -130,10 +136,12 @@ Navegador → public/.htaccess → public/index.php (Front Controller)
 
 1. Copie a pasta do projeto para `C:\xampp\htdocs\bazar-universitario` (Linux: `/opt/lampp/htdocs/bazar-universitario`).
 2. No painel do XAMPP, inicie **Apache** e **MySQL**.
-3. Abra `http://localhost/phpmyadmin` → aba **Importar** → selecione `database/schema.sql` → **Executar**.
-   (Opcional: importe também `database/dados-exemplo.sql`.)
-4. Copie `config/config.example.php` para `config/config.php`. O padrão (`root` sem senha) já funciona no XAMPP.
-5. Acesse **http://localhost/bazar-universitario/**
+3. Crie o banco de uma destas formas:
+   - `http://localhost/phpmyadmin` → aba **Importar** → `database/schema.sql` → **Executar** (opcional: depois `database/dados-exemplo.sql`); ou
+   - no terminal, na pasta do projeto: `php database/instalar.php --exemplo`
+4. Acesse **http://localhost/bazar-universitario/**
+
+Não é preciso configurar nada: sem variáveis de ambiente, o `config/config.php` usa o padrão do XAMPP (`root` sem senha, em `127.0.0.1`).
 
 O `.htaccess` da raiz redireciona tudo para `public/`, então não é preciso colocar `/public` na URL.
 
@@ -141,20 +149,25 @@ O `.htaccess` da raiz redireciona tudo para `public/`, então não é preciso co
 
 > Se as URLs como `/login` derem 404, confira se o `mod_rewrite` está ativo no `httpd.conf` do XAMPP (linha `LoadModule rewrite_module` sem `#`).
 
-> **XAMPP no Linux:** o Apache do XAMPP roda como o usuário `daemon`, que precisa gravar as fotos. Rode uma vez: `sudo chown -R daemon:daemon /opt/lampp/htdocs/bazar-universitario/public/uploads`. Sem isso, o cadastro de item com foto mostra "Não foi possível salvar a foto".
-
 ---
 
-## Deploy na nuvem (Google Cloud)
+## Deploy na nuvem (Vercel + Aiven)
 
-Resumo — o passo a passo completo, com os comandos e a solução de problemas comuns, está em **[docs/DEPLOY.md](docs/DEPLOY.md)**.
+O professor autorizou publicar na **Vercel** no lugar da VM do Google Cloud. O passo a passo completo, com a solução de problemas comuns, está em **[docs/DEPLOY.md](docs/DEPLOY.md)**. Resumo:
 
-1. VM **e2-micro** com **Ubuntu 22.04 LTS**, tráfego HTTP liberado, região `us-central1`/`us-east1`/`us-west1`.
-2. `sudo apt install -y apache2 php libapache2-mod-php php-mysql mysql-server git` (o mesmo comando do enunciado)
-3. `mysql_secure_installation`, criação do banco `bazar_universitario` e do usuário `bazar_app`.
-4. `git clone` em `/var/www/html`, `sudo mysql < database/schema.sql`, criação do `config/config.php` com `debug => false`.
-5. `DocumentRoot /var/www/html/public` + `AllowOverride All` + `a2enmod rewrite` (arquivo pronto em `deploy/000-default.conf`).
-6. Acessar `http://IP-EXTERNO/` (opcional: subdomínio DuckDNS).
+1. Criar um MySQL gratuito no **Aiven** e baixar o certificado para `config/ca.pem`.
+2. Criar as tabelas lá com `php database/instalar.php --exemplo` (usando as variáveis `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` e `DB_SSL=true`).
+3. Importar o repositório na **Vercel** e cadastrar as mesmas variáveis, mais `APP_ENV=producao`.
+
+**O que foi adaptado para a Vercel** (e continua funcionando no XAMPP):
+
+| Na Vercel... | Então o projeto... |
+|---|---|
+| só roda PHP que está em `api/` | tem o `api/index.php`, que repassa para o `public/index.php` |
+| não lê `.htaccess` | tem o `vercel.json` com as rotas |
+| pode atender cada acesso num servidor diferente | guarda as sessões no MySQL (`Core/SessaoNoBanco.php`) |
+| tem o disco somente leitura | guarda as fotos no MySQL (tabela `fotos`) |
+| não tem MySQL | usa o MySQL gratuito do Aiven, com conexão SSL |
 
 ---
 
@@ -172,9 +185,11 @@ git push -u origin main
 
 Segue o modelo sugerido no enunciado, com três ajustes:
 
-- `itens.foto` (VARCHAR, opcional) — para o bônus de upload;
+- `itens.foto` (VARCHAR, opcional) — nome da foto do item, para o bônus de upload;
 - `UNIQUE (item_id, usuario_id)` em `interesses` — o mesmo aluno não registra interesse duas vezes no mesmo item;
 - `ON DELETE CASCADE` em `interesses.item_id` — ao remover um item, os interesses dele somem junto.
+
+E duas tabelas de apoio, necessárias para rodar na Vercel: `fotos` (o conteúdo das imagens) e `sessoes` (as sessões de login).
 
 ```
 usuarios 1───N itens N───1 categorias
