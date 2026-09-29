@@ -5,7 +5,7 @@ Aplicação web onde estudantes cadastram itens (livros, materiais, eletrônicos
 Trabalho final da disciplina **AB722 — Programação para Web II**.
 PHP 8 orientado a objetos · padrão MVC · MySQL com PDO · publicado na Vercel (autorizado pelo professor) com banco MySQL no Aiven.
 
-- **Aplicação publicada:** https://SEU-PROJETO.vercel.app  <!-- trocar pelo link real -->
+- **Aplicação publicada:** https://trabalhoweb-blond.vercel.app  
 - **Autores:**
 
 | Nome | RA |
