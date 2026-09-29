@@ -50,7 +50,7 @@
 <footer class="rodape">
     <div class="container">
         <?= $this->e($this->nomeApp()) ?> · Trabalho final AB722 — Programação para Web II<br>
-        Desenvolvido por Nickolas Goulart Galasso (RA 842278) e Pedro dos Anjos Sanches (RA 842621) Felipe Martins Nascimento (RA - 842399)
+        Desenvolvido por Nickolas Goulart Galasso (RA 842278)  Pedro dos Anjos Sanches (RA 842621) e Felipe Martins Nascimento (RA - 842399)
     </div>
 </footer>
 
